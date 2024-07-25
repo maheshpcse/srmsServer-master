@@ -10,8 +10,8 @@ const https = require('https');
 const mysql = require('mysql');
 const cookieParser = require('cookie-parser');
 const { Model } = require('objection');
-var config = require('./configs/db.config.js');
-var routes = require('./routes/user.routes.js');
+var config = require('./configs/env.config.js');
+var adminRoutes = require('./routes/admin.routes.js');
 var Knexx = require('./configs/knex.js');
 Model.knex(Knexx.knex);
 const app = express();
@@ -63,7 +63,7 @@ app.get('/connect', async (request, response) => {
 });
 
 // Routes
-// app.use('/api', routes);
+// app.use('/api', adminRoutes);
 
 app.listen(config.server.port, () => {
     console.log(`Employee Leave system server is listening on http://localhost:${config.server.port}`);
