@@ -10,10 +10,12 @@ const https = require('https');
 const mysql = require('mysql');
 const cookieParser = require('cookie-parser');
 const { Model } = require('objection');
-var config = require('./configs/env.config.js');
+var envConfig = require('./configs/env.config.js');
+const logger = require('./configs/logger.config');
 var adminRoutes = require('./routes/admin.routes.js');
 var Knexx = require('./configs/knex.js');
 Model.knex(Knexx.knex);
+
 const app = express();
 
 // require middleware functions
@@ -35,15 +37,15 @@ app.use(function (request, response, next) {
 // checking database connection
 app.get('/connect', async (request, response) => {
     var connection = mysql.createConnection({
-        host: config.database.host,
-        port: config.database.port,
-        user: config.database.username,
-        password: config.database.password,
-        database: config.database.db
+        host: envConfig.database.host,
+        port: envConfig.database.port,
+        user: envConfig.database.username,
+        password: envConfig.database.password,
+        database: envConfig.database.db
     });
     connection.connect((err) => {
         if (err) {
-            console.log('Error while db connection', err);
+            logger.error('Error while db connection', err);
             response.status(200).json({
                 success: false,
                 error: true,
@@ -51,7 +53,7 @@ app.get('/connect', async (request, response) => {
                 data: err
             });
         } else {
-            console.log('Database connection success');
+            logger.info('Database connection success');
             response.status(200).json({
                 success: true,
                 error: false,
@@ -63,10 +65,10 @@ app.get('/connect', async (request, response) => {
 });
 
 // Routes
-// app.use('/api', adminRoutes);
+app.use('/api', adminRoutes);
 
-app.listen(config.server.port, () => {
-    console.log(`Employee Leave system server is listening on http://localhost:${config.server.port}`);
+app.listen(envConfig.server.port, () => {
+    logger.info(`SRMS server is listening on http://localhost:${envConfig.server.port}`);
 });
 
 module.exports = app;
