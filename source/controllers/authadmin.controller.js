@@ -100,23 +100,11 @@ const adminLogin = async (request, response, next) => {
             throw errData;
         });
 
-        return response.status(200).json({
-            success: true,
-            error: false,
-            statusCode: 200,
-            message: 'Admin login successful',
-            data: adminData
-        });
+        sendResponse(response, true, false, 200, 'Admin login successful', adminData);
     } catch (error) {
         logger.error('Error at try catch API result', error);
 
-        return response.status(200).json({
-            success: false,
-            error: true,
-            statusCode: 500,
-            message: message || 'Error at try catch API result',
-            data: error
-        });
+        sendResponse(response, false, true, 500, message || 'Error at try catch API result', error);
     }
 }
 
@@ -170,13 +158,7 @@ const validateToken = async (request, response, next) => {
     } catch (error) {
         logger.error('Error at try catch API result', error);
 
-        return response.status(200).json({
-            success: false,
-            error: true,
-            statusCode: 500,
-            message: message || 'Error at try catch API result',
-            data: error
-        });
+        sendResponse(response, false, true, 500, message || 'Error at try catch API result', error);
     }
 }
 

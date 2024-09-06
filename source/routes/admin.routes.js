@@ -18,5 +18,7 @@ router.post('/admin_login', authAdminCtrl.adminLogin);
 
 // School routes
 router.post('/add_or_update_school_info', schoolCtrl.addOrUpdateSchoolInfo);
+router.post('/bulk_upload_school_info', schoolCtrl.bulkUploadSchoolInfo);
+router.get('/get_school_info_by_id/:school_id', schoolCtrl.getSchoolInfoById);
 
 module.exports = router;
