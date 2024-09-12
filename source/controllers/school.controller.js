@@ -75,21 +75,45 @@ const bulkUploadSchoolInfo = async (request, response, next) => {
     let schoolInfo = [];
     let message = '';
     try {
-        // STEP - 0:
+        // STEP - 0: We can validate below points in UI code.
         // --> Need to validate the duplicate school names found in request.body
         // --> Need to validate the duplicate school emails found in request.body
         // --> Need to validate the duplicate school phone numbers found in request.body
 
         // STEP - 1:
         let schoolNames = Object.keys(_.groupBy(request.body, 'schoolname')) || [];
+        let schoolEmails = Object.keys(_.groupBy(request.body, 'email')) || [];
+        let schoolPhoneNumbers = Object.keys(_.groupBy(request.body, 'phonenumber')) || [];
 
-        let rawQuery = `SELECT school_id,schoolname FROM school_info WHERE schoolname IN('${schoolNames.join("','")}') ORDER BY school_id ASC;`;
+        let rawQuery = `SELECT school_id,schoolname,email,phonenumber FROM school_info WHERE schoolname IN('${schoolNames.join("','")}') OR `;
+        rawQuery += `email IN('${schoolEmails.join("','")}') OR `;
+        rawQuery += `phonenumber IN('${schoolPhoneNumbers.join("','")}') ORDER BY school_id ASC;`;
 
-        logger.info('rawQuery isss:', rawQuery);
+        // logger.info('rawQuery isss:', rawQuery);
 
         await userSP.selectDataQuery(rawQuery).then(async resData => {
-            logger.info('Get rawQuery resData isss', resData);
-            result = resData;
+            // logger.info('Get rawQuery resData isss', resData);
+            // result = resData;
+            let groupByEmail = _.groupBy(resData, 'email') || {};
+            let groupByPhoneNumber = _.groupBy(resData, 'phonenumber') || {};
+            console.log('groupByEmail isss:', groupByEmail);
+            // console.log('groupByPhoneNumber isss:', groupByPhoneNumber);
+
+            // Need to compare request.body with resultData
+            // request.body = JSON.parse(request.body); // use this parse when request.body comes from UI
+            for (let item of request.body) {
+                item['school_id'] = null;
+                for (let data of resData) {
+                    if (item['schoolname'] == data['schoolname']) {
+                        item['school_id'] = data['school_id'];
+                        // if (groupByEmail.hasOwnProperty(item['email']) && groupByEmail[0]['email'] != data['email']) {
+                        // }
+                    }
+                }
+                schoolInfo.push(item);
+            }
+            console.log('final schoolInfo isss:', schoolInfo);
+            result = schoolInfo;
 
             /* await userSP.insertOrUpdateDataSP(spConfig.BULK_UPLOAD_SCHOOL_INFO, Object.values(request.body), null).then(async resData => {
                 // logger.info('Get bulk upload school info resData isss', resData);

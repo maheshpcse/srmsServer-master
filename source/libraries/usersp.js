@@ -13,7 +13,8 @@ const selectDataQuery = function (rawQuery) {
             return Knexx.knex.raw(rawQuery);
         });
         mod.then(result => {
-            console.log('selectDataQuery result isss:', result);
+            // console.log('selectDataQuery result isss:', result);
+            // console.log('selectDataQuery result[0] isss:', result[0]);
             if (result && result.length && result[0].length) {
                 if (result[0].length > 0) {
                     resolve(result[0]);
